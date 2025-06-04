@@ -394,9 +394,15 @@ class TestCli:
         """Test that the error message is correct when the directory does not exist."""
         with contextlib.redirect_stderr(StringIO()) as stderr:
             parser = cli_parser.get_parser()
-            with pytest.raises(SystemExit):
-                parser.parse_args(["db", "export-archived", "--output-path", "/non/existing/directory"])
+            with pytest.raises(SystemExit) as excinfo:
+                parser.parse_args([
+                    "db",
+                    "export-archived",
+                    "--output-path",
+                    "/non/existing/directory",
+                ])
             error_msg = stderr.getvalue()
+        assert excinfo.value.code != 0
 
         assert error_msg == (
             "\nairflow db export-archived command error: The directory "
